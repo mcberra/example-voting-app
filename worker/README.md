@@ -11,3 +11,4 @@
   ### PACKAGE STATUS ###
   
   [![Build Status](http://34.105.180.36:8080/buildStatus/icon?job=insta-vote%2Fworker-package-job)](http://34.105.180.36:8080/job/insta-vote/job/worker-package-job/)
+  http://34.105.180.36:8080/job/insta-vote/job/worker-package-job/badge/icon?subject=Custom%20Subject&status=Any%20State&color=darkturquoise
