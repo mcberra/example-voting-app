@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Build') { 
             steps {
-                echo 'Starting stage number 1.....'
+                echo 'Starting BUILD.....'
                 echo 'Compiling worker app'
 		dir('worker'){
 		    sh 'mvn compile' 
@@ -16,15 +16,19 @@ pipeline {
         }
         stage('Test') { 
             steps {
-                echo 'Starting stage number 2.....'
-                echo 'Running Unit test on worker app'
+                echo 'Starting TEST.....'
+		dir('worker'){
+		    sh 'mvn clean test' 
+		}
                 echo '### FINISHED TESTING ###'
             }
         }
         stage('Package') { 
             steps {
-                echo 'Starting stage number 3.....'
-                echo 'Packaging worker app' 
+                echo 'Starting PACKGING.....'
+		dir('worker'){
+		    sh 'mvn package' 
+		}
                 echo '### FINISHED PACKAGING ###' 
             }
         }
