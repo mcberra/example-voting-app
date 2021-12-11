@@ -1,9 +1,13 @@
 pipeline {
-    agent any
-    tools {
-        maven 'Maven-3.6.1' 
+    agent {
+        docker {
+            image 'maven:3.6.1-jdk-8-alpine'
+            args '-v $HOME/.m2:/root/.m2'
+        }
     }
+
     stages {
+
         stage('Build') { 
             steps {
                 echo 'Starting BUILD.....'
@@ -14,6 +18,7 @@ pipeline {
                 echo '### FINISHED BUILDING ###'
             }
         }
+
         stage('Test') { 
             steps {
                 echo 'Starting TEST.....'
@@ -23,6 +28,7 @@ pipeline {
                 echo '### FINISHED TESTING ###'
             }
         }
+
         stage('Package') { 
 	    when {
 		branch 'master'
