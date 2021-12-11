@@ -10,7 +10,7 @@ pipeline {
             steps {
                 echo 'Compiling worker app'
 		dir('result'){
-		    sh 'pip install -i requirements.txt' 
+		    sh 'pip install -r requirements.txt' 
 		}
                 echo '### FINISHED BUILDING ###'
             }
