@@ -24,18 +24,22 @@ pipeline {
             }
         }
         stage('Package') { 
+	    when {
+		branch 'master'
+		changeset "**/worker/**"
+	    }
             steps {
                 echo 'Starting PACKGING.....'
 		dir('worker'){
 		    sh 'mvn package -DskipTests'
 		}
+		archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
                 echo '### FINISHED PACKAGING ###' 
             }
         }
     }
         post { 
             always { 
-		archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
                 echo 'This pipeline run is completed!'
         }
     }
