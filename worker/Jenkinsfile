@@ -66,7 +66,7 @@ pipeline {
                 echo 'Starting PACKAGING the app with docker.....'
                 script{
                   docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
-                     def workerImage = docker.build("mcberra/worker-app:v${env.BUILD_ID}", "./worker")
+                     def workerImage = docker.build("mcberra/worker:v${env.BUILD_ID}", "./worker")
 		     workerImage.push()
                      workerImage.push("${env.BRANCH_NAME}")
                   }
