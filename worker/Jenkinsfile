@@ -1,14 +1,15 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.6.1-jdk-8-alpine'
-            args '-v $HOME/.m2:/root/.m2'
-        }
-    }
+    agent none
 
     stages {
 
         stage('Build') { 
+    	  agent {
+            docker {
+              image 'maven:3.6.1-jdk-8-alpine'
+              args '-v $HOME/.m2:/root/.m2'
+            }
+        }
             steps {
                 echo 'Starting BUILD.....'
                 echo 'Compiling worker app'
@@ -20,6 +21,12 @@ pipeline {
         }
 
         stage('Test') { 
+    	    agent {
+              docker {
+                image 'maven:3.6.1-jdk-8-alpine'
+                args '-v $HOME/.m2:/root/.m2'
+              }
+          }
             steps {
                 echo 'Starting TEST.....'
 		dir('worker'){
@@ -30,12 +37,18 @@ pipeline {
         }
 
         stage('Package') { 
+    	    agent {
+              docker {
+                image 'maven:3.6.1-jdk-8-alpine'
+                args '-v $HOME/.m2:/root/.m2'
+              }
+          }
 	    when {
 		branch 'master'
 		changeset "**/worker/**"
 	    }
             steps {
-                echo 'Starting PACKGING.....'
+                echo 'Starting PACKGING......'
 		dir('worker'){
 		    sh 'mvn package -DskipTests'
 		}
@@ -43,6 +56,25 @@ pipeline {
                 echo '### FINISHED PACKAGING ###' 
             }
         }
+
+        stage('Docker-package') {
+            agent any 
+	    when {
+		changeset "**/worker/**"
+                branch 'master'
+	    }
+            steps {
+                echo 'Starting PACKAGING the app with docker.....'
+                script{
+                  docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
+                     def workerImage = docker.build("mcberra/worker:v${env.BUILD_ID}", "./worker")
+		     workerImage.push()
+                     workerImage.push("${env.BRANCH_NAME}")
+                  }
+                }
+            }
+        }
+
     }
         post { 
             always { 
