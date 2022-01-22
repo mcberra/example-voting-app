@@ -34,10 +34,6 @@ pipeline {
 
         stage('Docker-package') {
             agent any
-            when {
-                changeset "**/result/**"
-                branch 'master'
-            }
             steps {
                 echo 'Starting PACKAGING the app with docker.....'
                 script{
