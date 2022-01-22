@@ -1,24 +1,28 @@
 pipeline {
-    agent {
-        docker { image 'node:14-alpine' }
-    }
+    agent none
+
     stages {
-        stage('Build') { 
-	    when {
-		changeset "**/result/**"
-	    }
+
+        stage('Build') {
+          agent {
+            docker {
+              image 'node:14-alpine'
+              }
+            } 
             steps {
-                echo 'Compiling worker app'
+                echo 'Compiling Result app'
 		dir('result'){
 		    sh 'npm install' 
 		}
                 echo '### FINISHED BUILDING ###'
             }
         }
-        stage('Test') { 
-	    when {
-		changeset "**/result/**"
-	    }
+        stage('Test') {
+          agent {
+            docker {
+              image 'node:14-alpine'
+              } 
+            }
             steps {
 		dir('result'){
 		    sh 'npm install'
@@ -27,7 +31,22 @@ pipeline {
                 echo '### FINISHED TESTING ###'
             }
         }
+
+        stage('Docker-package') {
+            agent any
+            steps {
+                echo 'Starting PACKAGING the app with docker.....'
+                script{
+                  docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
+                     def workerImage = docker.build("mcberra/result:v${env.BUILD_ID}", "./result")
+                     workerImage.push()
+                     workerImage.push("${env.BRANCH_NAME}")
+                  }
+                }
+            }
+        }
     }
+
     post { 
         always { 
             echo 'This pipeline run is completed!'
