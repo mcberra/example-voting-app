@@ -1,9 +1,13 @@
 pipeline {
-    agent {
-        docker { image 'node:14-alpine' }
-    }
+    agent none
+
     stages {
-        stage('Build') { 
+
+        stage('Build') {
+          agent {
+            docker {
+              image 'node:14-alpine'
+            } 
 	    when {
 		changeset "**/result/**"
 	    }
@@ -15,7 +19,11 @@ pipeline {
                 echo '### FINISHED BUILDING ###'
             }
         }
-        stage('Test') { 
+        stage('Test') {
+          agent {
+            docker {
+              image 'node:14-alpine'
+            } 
 	    when {
 		changeset "**/result/**"
 	    }
