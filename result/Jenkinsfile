@@ -27,7 +27,6 @@ pipeline {
                 echo '### FINISHED TESTING ###'
             }
         }
-    }
 
         stage('Docker-package') {
             agent any
@@ -46,6 +45,7 @@ pipeline {
                 }
             }
         }
+    }
 
     post { 
         always { 
