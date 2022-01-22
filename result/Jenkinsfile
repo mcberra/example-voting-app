@@ -7,6 +7,7 @@ pipeline {
           agent {
             docker {
               image 'node:14-alpine'
+              }
             } 
 	    when {
 		changeset "**/result/**"
@@ -23,7 +24,8 @@ pipeline {
           agent {
             docker {
               image 'node:14-alpine'
-            } 
+              } 
+            }
 	    when {
 		changeset "**/result/**"
 	    }
