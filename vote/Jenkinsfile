@@ -9,9 +9,6 @@ pipeline {
               }
             }
         stage('Build') { 
-	    when {
-		changeset "**/vote/**"
-	    }
             steps {
                 echo 'Compiling vote app'
 		dir('vote'){
@@ -27,9 +24,6 @@ pipeline {
 	        args '--user root'
               }
             } 
-	    when {
-		changeset "**/vote/**"
-	    }
             steps {
 		dir('vote'){
 		    sh 'nosetests -v'

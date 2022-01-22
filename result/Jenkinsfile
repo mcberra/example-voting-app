@@ -9,9 +9,6 @@ pipeline {
               image 'node:14-alpine'
               }
             } 
-	    when {
-		changeset "**/result/**"
-	    }
             steps {
                 echo 'Compiling Result app'
 		dir('result'){
@@ -26,9 +23,6 @@ pipeline {
               image 'node:14-alpine'
               } 
             }
-	    when {
-		changeset "**/result/**"
-	    }
             steps {
 		dir('result'){
 		    sh 'npm install'
