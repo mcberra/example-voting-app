@@ -75,6 +75,48 @@ pipeline {
             }
         }
 
+        stage('Resul-Build') {
+          agent {
+            docker {
+              image 'node:14-alpine'
+              }
+            }
+            steps {
+                echo 'Compiling Result app'
+                dir('result'){
+                    sh 'npm install'
+                }
+                echo '### FINISHED BUILDING ###'
+            }
+        }
+        stage('Result-Test') {
+          agent {
+            docker {
+              image 'node:14-alpine'
+              }
+            }
+            steps {
+                dir('result'){
+                    sh 'npm install'
+                    sh 'npm test'
+                }
+                echo '### FINISHED TESTING ###'
+            }
+        }
+
+        stage('Result-Docker-package') {
+            agent any
+            steps {
+                echo 'Starting PACKAGING the app with docker.....'
+                script{
+                  docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
+                     def workerImage = docker.build("mcberra/result:v${env.BUILD_ID}", "./result")
+                     workerImage.push()
+                     workerImage.push("${env.BRANCH_NAME}")
+                  }
+                }
+            }
+        }
         stage('Vote-Build') {
 
           agent {
@@ -123,53 +165,6 @@ pipeline {
                 }
             }
         }
-
-
-        stage('Resul-Build') {
-          agent {
-            docker {
-              image 'node:14-alpine'
-              }
-            }
-            steps {
-                echo 'Compiling Result app'
-                dir('result'){
-                    sh 'npm install'
-                }
-                echo '### FINISHED BUILDING ###'
-            }
-        }
-        stage('Result-Test') {
-          agent {
-            docker {
-              image 'node:14-alpine'
-              }
-            }
-            steps {
-                dir('result'){
-                    sh 'npm install'
-                    sh 'npm test'
-                }
-                echo '### FINISHED TESTING ###'
-            }
-        }
-
-        stage('Result-Docker-package') {
-            agent any
-            steps {
-                echo 'Starting PACKAGING the app with docker.....'
-                script{
-                  docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
-                     def workerImage = docker.build("mcberra/result:v${env.BUILD_ID}", "./result")
-                     workerImage.push()
-                     workerImage.push("${env.BRANCH_NAME}")
-                  }
-                }
-            }
-        }
-
-
-
 
 
 
