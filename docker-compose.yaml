@@ -1,0 +1,53 @@
+version: "3.7"
+
+volumes:
+  db-data:
+
+networks:
+  instavote:
+    driver: bridge
+
+services:
+
+  vote:
+    image: mcberra/vote:master
+    build: ./vote
+    ports:
+      - 8100:80
+    depends_on:
+      - redis
+    networks:
+      - instavote
+
+  redis:
+    image: redis:alpine
+    networks:
+      - instavote
+
+  db:
+    image: postgres:9.4
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - "db-data:/var/lib/postgresql/data"
+    networks:
+      - instavote
+
+  result:
+    image: mcberra/result:latest
+    build: ./result
+    ports:
+      - 8101:4000
+    depends_on:
+      - db
+    networks:
+      - instavote
+
+  worker:
+    image: mcberra/worker:master
+    build: ./worker
+    depends_on:
+      - redis
+      - db
+    networks:
+      - instavote
