@@ -3,65 +3,49 @@ pipeline {
 
     stages {
 
-        stage('Build') { 
-    	  agent {
+        stage('Build') {
+ 
+          agent {
             docker {
-              image 'maven:3.6.1-jdk-8-alpine'
-              args '-v $HOME/.m2:/root/.m2'
-            }
-        }
+	      image 'python:2.7.16-slim'
+	      args '--user root'
+                }
+              }
+
             steps {
-                echo 'Starting BUILD.....'
-                echo 'Compiling worker app'
-		dir('worker'){
-		    sh 'mvn compile' 
+                echo 'Compiling vote app'
+		dir('vote'){
+		    sh 'pip install -r requirements.txt' 
 		}
                 echo '### FINISHED BUILDING ###'
             }
         }
 
-        stage('Test') { 
-    	    agent {
+        stage('Test') {
+            agent {
               docker {
-                image 'maven:3.6.1-jdk-8-alpine'
-                args '-v $HOME/.m2:/root/.m2'
+	        image 'python:2.7.16-slim'
+	        args '--user root'
               }
-          }
+            } 
             steps {
-                echo 'Starting TEST.....'
-		dir('worker'){
-		    sh 'mvn clean test' 
-		}
-                echo '### FINISHED TESTING ###'
-            }
-        }
 
-        stage('Package') { 
-    	    agent {
-              docker {
-                image 'maven:3.6.1-jdk-8-alpine'
-                args '-v $HOME/.m2:/root/.m2'
-              }
-          }
-            steps {
-                echo 'Starting PACKGING......'
-		dir('worker'){
-		    sh 'mvn package -DskipTests'
+                echo '###  TESTING VOTE APP ###'
+		dir('vote'){
+		    sh 'pip install -r requirements.txt' 
+		    sh 'nosetests -v'
 		}
-		archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
-                echo '### FINISHED PACKAGING ###' 
             }
         }
 
         stage('Docker-package') {
-            agent any 
-
+            agent any
             steps {
                 echo 'Starting PACKAGING the app with docker.....'
                 script{
                   docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
-                     def workerImage = docker.build("mcberra/worker:v${env.BUILD_ID}", "./worker")
-		     workerImage.push()
+                     def workerImage = docker.build("mcberra/vote:v${env.BUILD_ID}", "./vote")
+                     workerImage.push()
                      workerImage.push("${env.BRANCH_NAME}")
                   }
                 }
@@ -69,9 +53,10 @@ pipeline {
         }
 
     }
-        post { 
-            always { 
-                echo 'This pipeline run is completed!'
+
+    post { 
+        always { 
+            echo 'This pipeline run is completed!'
         }
     }
 }
