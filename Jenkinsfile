@@ -3,7 +3,7 @@ pipeline {
 
     stages {
 
-        stage('Worker-Build') { 
+        stage('Build') { 
     	  agent {
             docker {
               image 'maven:3.6.1-jdk-8-alpine'
@@ -20,7 +20,7 @@ pipeline {
             }
         }
 
-        stage('Worker-Test') { 
+        stage('Test') { 
     	    agent {
               docker {
                 image 'maven:3.6.1-jdk-8-alpine'
@@ -36,7 +36,7 @@ pipeline {
             }
         }
 
-        stage('Worker-Package') { 
+        stage('Package') { 
     	    agent {
               docker {
                 image 'maven:3.6.1-jdk-8-alpine'
@@ -53,8 +53,9 @@ pipeline {
             }
         }
 
-        stage('Worker-Docker-package') {
+        stage('Docker-package') {
             agent any 
+
             steps {
                 echo 'Starting PACKAGING the app with docker.....'
                 script{
@@ -67,11 +68,10 @@ pipeline {
             }
         }
 
-
     }
         post { 
             always { 
-                echo '##################### This pipeline run is completed!'
+                echo 'This pipeline run is completed!'
         }
     }
 }
