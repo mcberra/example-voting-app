@@ -46,10 +46,6 @@ pipeline {
         }
 
       }
-      when {
-        branch 'master'
-        changeset '**/worker/**'
-      }
       steps {
         echo 'Starting PACKGING......'
         dir(path: 'worker') {
@@ -63,10 +59,6 @@ pipeline {
 
     stage('Worker-Docker-package') {
       agent any
-      when {
-        changeset '**/worker/**'
-        branch 'master'
-      }
       steps {
         echo 'Starting PACKAGING the app with docker.....'
         script {
