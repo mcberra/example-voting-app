@@ -7,10 +7,9 @@ pipeline {
           image 'maven:3.6.1-jdk-8-alpine'
           args '-v $HOME/.m2:/root/.m2'
         }
+      }
      when{
         changeset "**/worker/**"
-      }
-
       }
       steps {
         echo 'Starting BUILD.....'
