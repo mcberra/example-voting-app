@@ -7,6 +7,9 @@ pipeline {
           image 'maven:3.6.1-jdk-8-alpine'
           args '-v $HOME/.m2:/root/.m2'
         }
+     when{
+        changeset "**/worker/**"
+      }
 
       }
       steps {
@@ -27,6 +30,9 @@ pipeline {
           args '-v $HOME/.m2:/root/.m2'
         }
 
+     when{
+        changeset "**/worker/**"
+      }
       }
       steps {
         echo 'Starting TEST.....'
@@ -45,6 +51,9 @@ pipeline {
           args '-v $HOME/.m2:/root/.m2'
         }
 
+     when{
+        changeset "**/worker/**"
+      }
       }
       steps {
         echo 'Starting PACKGING......'
@@ -59,6 +68,9 @@ pipeline {
 
     stage('Worker-Docker-package') {
       agent any
+     when{
+        changeset "**/worker/**"
+      }
       steps {
         echo 'Starting PACKAGING the app with docker.....'
         script {
@@ -78,6 +90,9 @@ pipeline {
           image 'node:14-alpine'
         }
 
+     when{
+        changeset "**/result/**"
+      }
       }
       steps {
         echo 'Compiling Result app'
@@ -95,6 +110,9 @@ pipeline {
           image 'node:14-alpine'
         }
 
+     when{
+        changeset "**/result/**"
+      }
       }
       steps {
         dir(path: 'result') {
@@ -108,6 +126,9 @@ pipeline {
 
     stage('Result-Docker-package') {
       agent any
+     when{
+        changeset "**/result/**"
+      }
       steps {
         echo 'Starting PACKAGING the app with docker.....'
         script {
@@ -128,6 +149,9 @@ pipeline {
           args '--user root'
         }
 
+     when{
+        changeset "**/vote/**"
+      }
       }
       steps {
         echo 'Compiling vote app'
@@ -146,6 +170,9 @@ pipeline {
           args '--user root'
         }
 
+     when{
+        changeset "**/vote/**"
+      }
       }
       steps {
         echo '###  TESTING VOTE APP ###'
@@ -159,6 +186,9 @@ pipeline {
 
     stage('Vote-Docker-package') {
       agent any
+     when{
+        changeset "**/vote/**"
+      }
       steps {
         echo 'Starting PACKAGING the app with docker.....'
         script {
