@@ -28,10 +28,9 @@ pipeline {
           image 'maven:3.6.1-jdk-8-alpine'
           args '-v $HOME/.m2:/root/.m2'
         }
-
+      }
      when{
         changeset "**/worker/**"
-      }
       }
       steps {
         echo 'Starting TEST.....'
@@ -49,10 +48,9 @@ pipeline {
           image 'maven:3.6.1-jdk-8-alpine'
           args '-v $HOME/.m2:/root/.m2'
         }
-
+      }
      when{
         changeset "**/worker/**"
-      }
       }
       steps {
         echo 'Starting PACKGING......'
@@ -88,10 +86,9 @@ pipeline {
         docker {
           image 'node:14-alpine'
         }
-
+      }
      when{
         changeset "**/result/**"
-      }
       }
       steps {
         echo 'Compiling Result app'
@@ -108,10 +105,9 @@ pipeline {
         docker {
           image 'node:14-alpine'
         }
-
+      }
      when{
         changeset "**/result/**"
-      }
       }
       steps {
         dir(path: 'result') {
@@ -147,10 +143,9 @@ pipeline {
           image 'python:2.7.16-slim'
           args '--user root'
         }
-
+      }
      when{
         changeset "**/vote/**"
-      }
       }
       steps {
         echo 'Compiling vote app'
@@ -168,10 +163,9 @@ pipeline {
           image 'python:2.7.16-slim'
           args '--user root'
         }
-
+      }
      when{
         changeset "**/vote/**"
-      }
       }
       steps {
         echo '###  TESTING VOTE APP ###'
