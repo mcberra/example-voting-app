@@ -7,7 +7,9 @@ pipeline {
           image 'maven:3.6.1-jdk-8-alpine'
           args '-v $HOME/.m2:/root/.m2'
         }
-
+      }
+     when{
+        changeset "**/worker/**"
       }
       steps {
         echo 'Starting BUILD.....'
@@ -26,7 +28,9 @@ pipeline {
           image 'maven:3.6.1-jdk-8-alpine'
           args '-v $HOME/.m2:/root/.m2'
         }
-
+      }
+     when{
+        changeset "**/worker/**"
       }
       steps {
         echo 'Starting TEST.....'
@@ -44,7 +48,9 @@ pipeline {
           image 'maven:3.6.1-jdk-8-alpine'
           args '-v $HOME/.m2:/root/.m2'
         }
-
+      }
+     when{
+        changeset "**/worker/**"
       }
       steps {
         echo 'Starting PACKGING......'
@@ -59,6 +65,9 @@ pipeline {
 
     stage('Worker-Docker-package') {
       agent any
+     when{
+        changeset "**/worker/**"
+      }
       steps {
         echo 'Starting PACKAGING the app with docker.....'
         script {
@@ -77,7 +86,9 @@ pipeline {
         docker {
           image 'node:14-alpine'
         }
-
+      }
+     when{
+        changeset "**/result/**"
       }
       steps {
         echo 'Compiling Result app'
@@ -94,7 +105,9 @@ pipeline {
         docker {
           image 'node:14-alpine'
         }
-
+      }
+     when{
+        changeset "**/result/**"
       }
       steps {
         dir(path: 'result') {
@@ -108,6 +121,9 @@ pipeline {
 
     stage('Result-Docker-package') {
       agent any
+     when{
+        changeset "**/result/**"
+      }
       steps {
         echo 'Starting PACKAGING the app with docker.....'
         script {
@@ -127,7 +143,9 @@ pipeline {
           image 'python:2.7.16-slim'
           args '--user root'
         }
-
+      }
+     when{
+        changeset "**/vote/**"
       }
       steps {
         echo 'Compiling vote app'
@@ -145,7 +163,9 @@ pipeline {
           image 'python:2.7.16-slim'
           args '--user root'
         }
-
+      }
+     when{
+        changeset "**/vote/**"
       }
       steps {
         echo '###  TESTING VOTE APP ###'
@@ -159,6 +179,9 @@ pipeline {
 
     stage('Vote-Docker-package') {
       agent any
+     when{
+        changeset "**/vote/**"
+      }
       steps {
         echo 'Starting PACKAGING the app with docker.....'
         script {
@@ -171,6 +194,45 @@ pipeline {
 
       }
     }
+
+
+    stage('Sonarqube') {
+      agent any
+ /*
+
+     when{
+        branch 'master'
+      }
+
+*/
+      tools {
+        jdk "JDK11" // the name you have given the JDK installation in Global Tool Configuration
+      }
+
+      environment{
+        sonarpath = tool 'SonarScanner'
+      }
+
+      steps {
+            echo 'Running Sonarqube Analysis......................................................................................................................'
+            withSonarQubeEnv('sonar-instavote') {
+              sh "${sonarpath}/bin/sonar-scanner -Dproject.settings=sonar-project.properties -Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400"
+            }
+      }
+    }
+
+
+    stage("Quality Gate") {
+        steps {
+            timeout(time: 1, unit: 'HOURS') {
+                // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
+                // true = set pipeline to UNSTABLE, false = don't
+                waitForQualityGate abortPipeline: true
+            }
+        }
+    }
+
+
 
     stage('Deploy to Dev') {
       agent any
